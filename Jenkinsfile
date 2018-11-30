@@ -8,7 +8,10 @@ pipeline {
   stages {
     stage('Configure') {
       steps {
-        cmake(installation: 'cmake', arguments: '-DCMAKE_INSTALL_PREFIX=$PWD/install', workingDir: '000build.tmp')
+        sh '''export COMPILER=gcc_5.4.0
+export MPI_VERSION=MPI_OFF
+PHASE=cmake ./common/build/build.pauli.jenkins.sh
+'''
       }
     }
   }
