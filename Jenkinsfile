@@ -5,7 +5,18 @@ pipeline {
     }
 
   }
-  stages {
+
+    parameters {
+        string(name: 'COMPILER', defaultValue: 'gcc_5.4.0', description: 'Compiler to use')
+        string(name: 'MPI_VERSION', defaultValue: 'MPI_OFF', description: 'MPI Version to link with')
+    }
+
+    environment {
+        COMPILER = "$COMPILER"
+        MPI_VERSION = "$MPI_VERSION"
+    }
+    
+    stages {
     stage('Configure') {
       steps {
         sh '''export PHASE=cmake
