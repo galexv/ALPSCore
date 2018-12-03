@@ -6,12 +6,30 @@ pipeline {
 
   }
   stages {
-    stage('Configure') {
-      steps {
-        sh '''export COMPILER=gcc_5.4.0
-export MPI_VERSION=MPI_OFF
-PHASE=cmake ./common/build/build.pauli.jenkins.sh
+    stage('Config gcc') {
+      parallel {
+        stage('Config gcc') {
+          environment {
+            COMPILER = 'gcc_5.4.0'
+            MPI_VERSION = 'MPI_OFF'
+          }
+          steps {
+            sh '''export PHASE=cmake
+./common/build/build.pauli.jenkins.sh
 '''
+          }
+        }
+        stage('Config clang') {
+          environment {
+            COMPILER = 'clang_3.4.2'
+            MPI_VERSION = 'MPI_OFF'
+          }
+          steps {
+            sh '''export PHASE=cmake
+./common/build/build.pauli.jenkins.sh
+'''
+          }
+        }
       }
     }
   }
