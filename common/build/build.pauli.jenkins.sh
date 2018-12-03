@@ -79,7 +79,7 @@ function run_cmake() {
           -DTestXMLOutput=TRUE \
           -DEIGEN3_INCLUDE_DIR=$HOME/.local/packages/eigen-3.3.4 \
           -DDocumentation=OFF \
-          ..
+          ../..
 }
 
 function run_make() {
