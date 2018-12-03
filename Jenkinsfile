@@ -1,3 +1,5 @@
+/** Declarative pipeline for Jenkins on Pauli */
+
 pipeline {
   agent {
     node {
@@ -6,6 +8,7 @@ pipeline {
 
   }
 
+    // Unfortunately, this has to be set manually.
     parameters {
         string(name: 'COMPILER', defaultValue: 'gcc_5.4.0', description: 'Compiler to use')
         string(name: 'MPI_VERSION', defaultValue: 'MPI_OFF', description: 'MPI Version to link with')
