@@ -14,7 +14,9 @@ pipeline {
             MPI_VERSION = 'MPI_OFF'
           }
           steps {
-            sh '''export PHASE=cmake
+            ws(dir: 'ws')
+            sh '''pwd
+export PHASE=cmake
 ./common/build/build.pauli.jenkins.sh
 '''
           }
@@ -25,7 +27,9 @@ pipeline {
             MPI_VERSION = 'MPI_OFF'
           }
           steps {
-            sh '''export PHASE=cmake
+            ws(dir: 'ws')
+            sh '''pwd
+export PHASE=cmake
 ./common/build/build.pauli.jenkins.sh
 '''
           }
