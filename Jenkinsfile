@@ -11,9 +11,9 @@ def call_phase(phase, compiler, mpilib) {
 /// Sub-pipeline for a project; returns closure defining the sub-pipe
 def sub_pipe(name, compiler, mpilib) {
     { ->
-        stash(name: name)
-        node("master-node") {
-            stage("My stage with ${name}") {
+        stage("My stage with ${name}") {
+            stash(name: name)
+            node("master-node") {
                 unstash(name: name)
                 
                 stage("Config") {
