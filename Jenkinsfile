@@ -12,16 +12,20 @@ def call_phase(phase, compiler, mpilib) {
 def sub_pipe(name, compiler, mpilib) {
     { -> 
         stage("My stage with ${name}") {
-            // ws(dir: name) {
+            stage("Config") {
                 echo "Config step with compiler=${compiler} mpilib=${mpilib}"
                 call_phase('cmake', compiler, mpilib)
+            }
 
+            stage("Build") {
                 echo "Build step with compiler=${compiler} mpilib=${mpilib}"
                 call_phase('make', compiler, mpilib)
-                
+            }
+
+            stage("Test")  {
                 echo "Test step with compiler=${compiler} mpilib=${mpilib}"
                 call_phase('test', compiler, mpilib)
-            // }
+            }
         }
     }
 }
@@ -48,9 +52,15 @@ pipeline {
                     projects = [:]
                     for (comp in params.COMPILERS.tokenize(',')) {
                         for (mpilib in params.MPI_VERSIONS.tokenize(',')) {
-                            key="compiler=${comp}_mpilib=${mpilib}"
-                            projects[key]=sub_pipe(key, comp, mpilib)
+
+                            // Filter out combinations that don't work with MPI
+                            if (comp=="gcc_5.4.0" || comp=="intel_18.0.5" || MPI_VERSION=="MPI_OFF") {
+                                key="compiler=${comp}_mpilib=${mpilib}"
+                                projects[key]=sub_pipe(key, comp, mpilib)
+                            }
+
                         }
+                        echo "DEBUG: Projects: ${projects}"
                         parallel (projects)
                         
                     }
