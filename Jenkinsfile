@@ -12,7 +12,7 @@ def call_phase(phase, compiler, mpilib) {
 def sub_pipe(name, compiler, mpilib) {
     { -> 
         stage("My stage with ${name}") {
-            ws(dir: name) {
+            // ws(dir: name) {
                 echo "Config step with compiler=${compiler} mpilib=${mpilib}"
                 call_phase('cmake', compiler, mpilib)
 
@@ -21,7 +21,7 @@ def sub_pipe(name, compiler, mpilib) {
                 
                 echo "Test step with compiler=${compiler} mpilib=${mpilib}"
                 call_phase('test', compiler, mpilib)
-            }
+            // }
         }
     }
 }
