@@ -11,8 +11,11 @@ def call_phase(phase, compiler, mpilib) {
 /// Sub-pipeline for a project; returns closure defining the sub-pipe
 def sub_pipe(name, compiler, mpilib) {
     { ->
+        stash(name: name)
         node("master-node") {
             stage("My stage with ${name}") {
+                unstash(name: name)
+                
                 stage("Config") {
                     echo "Config step with compiler=${compiler} mpilib=${mpilib}"
                     call_phase('cmake', compiler, mpilib)
