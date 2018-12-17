@@ -1,42 +1,61 @@
-pipeline {
-  agent {
-    node {
-      label 'master-node'
-    }
 
-  }
+/// Calling shell for the particular phase
+def call_phase(phase, compiler, mpilib) {
+    sh """export PHASE=${phase}
+          export COMPILER=${compiler}
+          export MPI_VERSION=${mpilib}
+          ./common/build/build.pauli.jenkins.sh
+       """
+}
+
+/// Sub-pipeline for a project; returns closure defining the sub-pipe
+def sub_pipe(name, compiler, mpilib) {
+    { -> 
+        stage("My stage with ${name}") {
+            ws(dir: name) {
+                echo "Config step with compiler=${compiler} mpilib=${mpilib}"
+                call_phase('cmake', compiler, mpilib)
+
+                echo "Build step with compiler=${compiler} mpilib=${mpilib}"
+                call_phase('make', compiler, mpilib)
+                
+                echo "Test step with compiler=${compiler} mpilib=${mpilib}"
+                call_phase('test', compiler, mpilib)
+            }
+        }
+    }
+}
+
+
+pipeline {
+    agent {
+        node {
+            label 'master-node'
+        }
+
+    }
 
     parameters {
-        string(name: 'COMPILER', defaultValue: 'gcc_5.4.0', description: 'Compiler to use')
-        string(name: 'MPI_VERSION', defaultValue: 'MPI_OFF', description: 'MPI Version to link with')
+        string(name: 'COMPILERS', defaultValue: 'gcc_4.8.5,gcc_5.4.0,clang_3.4.2,clang_5.0.1,intel_18.0.5', description: 'Compilers to use')
+        string(name: 'MPI_VERSIONS', defaultValue: 'MPI_OFF,OpenMPI', description: 'MPI versions to link with')
     }
 
-    environment {
-        COMPILER = "$COMPILER"
-        MPI_VERSION = "$MPI_VERSION"
-    }
-    
     stages {
-    stage('Configure') {
-      steps {
-        sh '''export PHASE=cmake
-./common/build/build.pauli.jenkins.sh
-'''
-      }
+        stage('Parallel stages') {
+            steps {
+                script {
+
+                    projects = [:]
+                    for (comp in params.COMPILERS.tokenize(',')) {
+                        for (mpilib in params.MPI_VERSIONS.tokenize(',')) {
+                            key="compiler=${comp}_mpilib=${mpilib}"
+                            projects[key]=sub_pipe(key, comp, mpilib)
+                        }
+                        parallel (projects)
+                        
+                    }
+                }
+            }
+        }
     }
-    stage('Build') {
-      steps {
-        sh '''export PHASE=make
-./common/build/build.pauli.jenkins.sh
-'''
-      }
-    }
-    stage('Test') {
-      steps {
-        sh '''export PHASE=test
-./common/build/build.pauli.jenkins.sh
-'''
-      }
-    }
-  }
 }
