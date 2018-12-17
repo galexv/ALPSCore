@@ -54,7 +54,7 @@ pipeline {
                         for (mpilib in params.MPI_VERSIONS.tokenize(',')) {
 
                             // Filter out combinations that don't work with MPI
-                            if (comp=="gcc_5.4.0" || comp=="intel_18.0.5" || MPI_VERSION=="MPI_OFF") {
+                            if (comp=="gcc_5.4.0" || comp=="intel_18.0.5" || mpilib=="MPI_OFF") {
                                 key="compiler=${comp}_mpilib=${mpilib}"
                                 projects[key]=sub_pipe(key, comp, mpilib)
                             }
