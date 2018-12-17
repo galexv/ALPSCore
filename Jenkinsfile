@@ -60,12 +60,12 @@ pipeline {
                             }
 
                         }
-                        echo "DEBUG: Projects: ${projects}"
-                        parallel (projects)
-                        
                     }
-                }
-            }
-        }
-    }
+                    echo "DEBUG: Projects: ${projects}"
+                    parallel (projects)
+
+                } // end script
+            } // end steps
+        } // end stage
+    } // end stages
 }
